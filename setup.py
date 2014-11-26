@@ -20,7 +20,8 @@ setup(
     description='An interface to iredadmin',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
-        "Programming Language :: Python",
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
     ],
     author='Paul Szabo',
     author_email='paul@cupromotions.ca',

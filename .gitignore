@@ -4,3 +4,5 @@ venv/
 .eggs
 *.pyc
 __pycache__/
+.pypirc
+dist/
