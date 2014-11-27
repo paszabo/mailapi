@@ -96,3 +96,26 @@ def delete_mailbox(email_address):
         filter_by(username=email_address).delete()
 
     return num_deleted == 1
+
+
+def get_all_mailboxes():
+    """ Gets a list of all mailboxes defined in the database
+
+    :return: List of Mailbox objects
+    """
+
+    return get_db_session().query(Mailbox).all()
+
+
+def get_mailbox(email_address):
+    """ Gets the mailbox by the given email address
+
+    :param email_address: String
+    :return: Mailbox or None
+    """
+
+    if not mailbox_exists(email_address):
+        return None
+
+    return get_db_session().query(Mailbox).\
+        filter_by(username=email_address).one()

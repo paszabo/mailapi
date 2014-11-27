@@ -1,6 +1,12 @@
 from unittest import TestCase
 
-from ..mailbox import create_mailbox, delete_mailbox, mailbox_exists
+from ..mailbox import (
+    create_mailbox,
+    delete_mailbox,
+    mailbox_exists,
+    get_all_mailboxes,
+    get_mailbox,
+)
 from ..domain import create_domain, delete_domain
 from ..models import Mailbox
 
@@ -95,3 +101,38 @@ class DeleteMailboxTests(MailboxBaseCase):
     def test_delete_invalid_mailbox(self):
         email_address = ''.join(['asdfasdflksdf', '@', self.domain_name])
         self.assertRaises(RuntimeError, delete_mailbox, email_address)
+
+
+class GetMailboxTests(MailboxBaseCase):
+    def test_get_mailbox(self):
+        email_address = ''.join(['testusr', '@', self.domain_name])
+
+        # Creates a mailbox
+        mailbox = create_mailbox(email_address, 'Test User', 'password123')
+
+        # We should get back the mailbox we just created
+        self.assertEqual(get_mailbox(email_address), mailbox)
+
+        # cleanup
+        self.assertTrue(delete_mailbox(email_address))
+
+    def test_get_nonexistant_mailbox(self):
+        self.assertFalse(get_mailbox('asjdhfakjsdhf'))
+
+    def test_get_all_mailboxes(self):
+        email_address = ''.join(['testusr', '@', self.domain_name])
+
+        # Creates a mailbox
+        mailbox = create_mailbox(email_address, 'Test User', 'password123')
+
+        # Gets a list of all mailboxes
+        mailboxes = get_all_mailboxes()
+
+        # It should be a list
+        self.assertIsInstance(mailboxes, list)
+
+        # Our mailbox should be in it
+        self.assertIn(mailbox, mailboxes)
+
+        # cleanup
+        self.assertTrue(delete_mailbox(email_address))
