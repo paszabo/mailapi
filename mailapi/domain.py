@@ -46,6 +46,19 @@ def get_domain(domain_name):
         return None
 
 
+def get_all_mailboxes(domain_name):
+    """ Gets a list of all mailboxes associated with the given domain
+
+    :param domain_name: String
+    :return: Listof Mailbox objects
+    """
+
+    if not domain_exists(domain_name):
+        raise RuntimeError(DOMAIN_DNE % domain_name)
+
+    return get_db_session().query(Mailbox).filter_by(domain=domain_name).all()
+
+
 def get_all_domains():
     """ Fetches all domains from the database
 

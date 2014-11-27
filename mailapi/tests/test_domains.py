@@ -9,6 +9,7 @@ from ..domain import (
     domain_exists,
     delete_mailboxes,
     delete_aliases,
+    get_all_mailboxes,
 )
 from ..mailbox import create_mailbox
 
@@ -184,3 +185,33 @@ class DomainExistsTests(TestCase):
 
         # Now it shouldn't exist, right?
         self.assertFalse(domain_exists(domain_name))
+
+
+class GetAllMailboxesTests(TestCase):
+    def test_get_all_mailboxes(self):
+        domain_name = 'testdomain.lan'
+        domain_description = 'Test Domain'
+
+        # Creates a domain
+        create_domain(domain_name, domain_description)
+
+        # Create a mailbox in the domain
+        mailbox = create_mailbox('testuser@testdomain.lan',
+                                 'Test User',
+                                 'password123')
+
+        # Gets all the mailboxes associated with the domain
+        mailboxes = get_all_mailboxes(domain_name)
+
+        # The result should be a list
+        self.assertIsInstance(mailboxes, list)
+
+        # Our mailbox should be in the list we got back
+        self.assertIn(mailbox, mailboxes)
+
+        # cleanup (also deletes the mailbox)
+        self.assertTrue(delete_domain(domain_name))
+
+    def test_get_all_mailboxes_for_nonexistant_domain(self):
+        # Should raise a runtime error
+        self.assertRaises(RuntimeError, get_all_mailboxes, 'asdfkljahsdfkja')
