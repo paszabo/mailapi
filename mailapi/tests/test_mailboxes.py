@@ -6,6 +6,8 @@ from ..mailbox import (
     mailbox_exists,
     get_all_mailboxes,
     get_mailbox,
+    reset_mailbox_password,
+    search_mailboxes,
 )
 from ..domain import create_domain, delete_domain
 from ..models import Mailbox
@@ -133,6 +135,85 @@ class GetMailboxTests(MailboxBaseCase):
 
         # Our mailbox should be in it
         self.assertIn(mailbox, mailboxes)
+
+        # cleanup
+        self.assertTrue(delete_mailbox(email_address))
+
+
+class MailboxPasswordResetTests(MailboxBaseCase):
+    def test_reset_password(self):
+        email_address = ''.join(['testusr', '@', self.domain_name])
+
+        # creates the mailbox
+        create_mailbox(email_address, 'Test User', 'password123')
+
+        # True implies the mailbox was updated with the new password
+        self.assertTrue(reset_mailbox_password(email_address,
+                                               'password90125'))
+
+        # cleanup
+        self.assertTrue(delete_mailbox(email_address))
+
+    def test_reset_password_for_nonexistant_mailbox(self):
+        # A RuntimeError should be raised when resetting the password for a
+        # non existant mailbox
+        self.assertRaises(RuntimeError,
+                          reset_mailbox_password,
+                          'adsfadsf',
+                          'new password')
+
+
+class MailboxSearchTest(MailboxBaseCase):
+    def test_mailbox_search(self):
+        email_address = ''.join(['testusr', '@', self.domain_name])
+
+        # creates the mailbox
+        mailbox = create_mailbox(email_address, 'Test User', 'password123')
+
+        # Searches for our mailbox
+        search_results = search_mailboxes('testusr')
+
+        # The result should be a list
+        self.assertIsInstance(search_results, list)
+
+        # Our mailbox should be in the results
+        self.assertIn(mailbox, search_results)
+
+        # cleanup
+        self.assertTrue(delete_mailbox(email_address))
+
+    def test_search_mailbox_by_domain(self):
+        email_address = ''.join(['testusr', '@', self.domain_name])
+
+        # creates the mailbox
+        mailbox = create_mailbox(email_address, 'Test User', 'password123')
+
+        # Searches for our mailbox
+        search_results = search_mailboxes(self.domain_name)
+
+        # The result should be a list
+        self.assertIsInstance(search_results, list)
+
+        # Our mailbox should be in the results
+        self.assertIn(mailbox, search_results)
+
+        # cleanup
+        self.assertTrue(delete_mailbox(email_address))
+
+    def test_search_mailbox_by_name(self):
+        email_address = ''.join(['testusr', '@', self.domain_name])
+
+        # creates the mailbox
+        mailbox = create_mailbox(email_address, 'Test User', 'password123')
+
+        # Searches for our mailbox
+        search_results = search_mailboxes('Test User')
+
+        # The result should be a list
+        self.assertIsInstance(search_results, list)
+
+        # Our mailbox should be in the results
+        self.assertIn(mailbox, search_results)
 
         # cleanup
         self.assertTrue(delete_mailbox(email_address))

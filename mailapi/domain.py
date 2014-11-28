@@ -22,7 +22,8 @@ def create_domain(domain_name, description=''):
         raise ValueError('Invalid domain name supplied: %s' % domain_name)
 
     if domain_exists(domain_name):
-        raise RuntimeError
+        raise RuntimeError('A domain with the name supplied already exists: %s'
+                           % domain_name)
 
     db_session = get_db_session()
     d = Domain(domain=domain_name, description=description)

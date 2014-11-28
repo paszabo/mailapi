@@ -59,9 +59,9 @@ def create_mailbox(email_address,
     # See: https://bitbucket.org/zhb/iredadmin-ose/src/45d6d5c30269d32d7818ea9dd1d5e0fb0d962d46/libs/mysql/user.py?at=default#cl-255 # noqa (suppresses PEP8 warning)
     add_alias(email_address, email_address)
 
-    DBSession = get_db_session()
-    DBSession.add(mailbox)
-    DBSession.flush()
+    db_session = get_db_session()
+    db_session.add(mailbox)
+    db_session.flush()
 
     return mailbox
 
@@ -119,3 +119,48 @@ def get_mailbox(email_address):
 
     return get_db_session().query(Mailbox).\
         filter_by(username=email_address).one()
+
+
+def reset_mailbox_password(email_address, plain_password):
+    """ Sets the password for the given email address to the given password
+
+    :param email_address: Email address
+    :param plain_password: The new desired password in plain text form
+    :return: True if success
+    :raises RuntimeError: If the given email address does not exist
+    """
+
+    if not mailbox_exists(email_address):
+        raise RuntimeError('The given email address does not exist: %s' %
+                           email_address)
+
+    mailbox = get_mailbox(email_address)
+    mailbox.password = generate_md5_password(plain_password)
+
+    db_session = get_db_session()
+    db_session.add(mailbox)
+    db_session.flush()
+
+    return True
+
+
+def search_mailboxes(search_string):
+    """ Returns a list of mailboxes with their email address or name like the
+    search string.
+
+    :param search_string: String
+    :return: List of Mailbox objects
+    """
+
+    db_session = get_db_session()
+    fuzzy_search_string = '%' + search_string + '%'
+
+    name_results = db_session.query(Mailbox).\
+        filter(Mailbox.name.like(fuzzy_search_string)).all()
+
+    email_addr_results = db_session.query(Mailbox).\
+        filter(Mailbox.username.like(fuzzy_search_string)).all()
+
+    search_results = list(set(name_results + email_addr_results))
+
+    return search_results
