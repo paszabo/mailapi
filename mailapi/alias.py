@@ -52,7 +52,8 @@ def get_aliases(dest):
 
 
 def delete_aliases(dest):
-    """ Deletes all aliases that redirect to the given email address
+    """ Deletes all aliases that redirect to the given email address except for
+    the self-referrential alias which must be explicitly deleted.
 
     :param dest: The goto address
     :return: True if success else False
@@ -60,8 +61,8 @@ def delete_aliases(dest):
 
     db_session = get_db_session()
     num_deleted = db_session.query(Alias).\
-        filter(Alias.goto == dest,
-                  Alias.address != dest).\
+        filter(Alias.goto == dest).\
+        filter(Alias.address != dest).\
         delete()
     db_session.flush()
 

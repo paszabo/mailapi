@@ -5,7 +5,7 @@ from .password import generate_md5_password
 from .maildir import generate_maildir_path
 from .models import Mailbox
 from .helpers import parse_email_domain
-from .alias import add_alias, delete_aliases
+from .alias import add_alias, delete_aliases, delete_alias
 from .db import get_db_session
 
 
@@ -92,6 +92,7 @@ def delete_mailbox(email_address):
                            email_address)
 
     delete_aliases(email_address)
+    delete_alias(email_address, email_address)
     num_deleted = get_db_session().query(Mailbox).\
         filter_by(username=email_address).delete()
 

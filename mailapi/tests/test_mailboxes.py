@@ -9,6 +9,7 @@ from ..mailbox import (
     reset_mailbox_password,
     search_mailboxes,
 )
+from ..alias import get_aliases
 from ..domain import create_domain, delete_domain
 from ..models import Mailbox
 
@@ -103,6 +104,28 @@ class DeleteMailboxTests(MailboxBaseCase):
     def test_delete_invalid_mailbox(self):
         email_address = ''.join(['asdfasdflksdf', '@', self.domain_name])
         self.assertRaises(RuntimeError, delete_mailbox, email_address)
+
+    def test_alias_deleted(self):
+        """ Makes sure that the self referrential alias gets deleted """
+
+        email_address = ''.join(['testusr', '@', self.domain_name])
+
+        # creates the mailbox
+        create_mailbox(email_address, 'Test User', 'password123')
+
+        # Gets the list of aliases associated with this email address
+        aliases = get_aliases(email_address)
+
+        # The self-referrential alias should be the only alias created
+        selfref_alias = aliases[0]
+        self.assertEqual(selfref_alias.address, email_address)
+        self.assertEqual(selfref_alias.goto, email_address)
+
+        # Deletes the mailbox
+        self.assertTrue(delete_mailbox(email_address))
+
+        # There should be no aliases associated with the email address now
+        self.assertEqual(len(get_aliases(email_address)), 0)
 
 
 class GetMailboxTests(MailboxBaseCase):
