@@ -1,4 +1,5 @@
 from unittest import TestCase
+from datetime import datetime
 
 from ..mailbox import (
     create_mailbox,
@@ -66,6 +67,19 @@ class CreateMailboxTests(MailboxBaseCase):
                           'test@fakedomain.tld',
                           'Test User',
                           'password123')
+
+    def test_mailbox_created_and_updated_dates_are_populated(self):
+        email_address = ''.join(['testusr', '@', self.domain_name])
+
+        # creates the mailbox
+        mailbox = create_mailbox(email_address, 'Test User', 'password123')
+
+        # Makes sure the created and updated fields are datetimes
+        self.assertIsInstance(mailbox.created, datetime)
+        self.assertIsInstance(mailbox.modified, datetime)
+
+        # cleanup
+        self.assertTrue(delete_mailbox(email_address))
 
 
 class MailboxExistsTests(MailboxBaseCase):
@@ -184,6 +198,31 @@ class MailboxPasswordResetTests(MailboxBaseCase):
                           reset_mailbox_password,
                           'adsfadsf',
                           'new password')
+
+    def test_modified_date_updated_after_pw_reset(self):
+        email_address = ''.join(['testusr', '@', self.domain_name])
+
+        # creates the mailbox
+        mailbox = create_mailbox(email_address, 'Test User', 'password123')
+
+        # Stores the initial modified dttm
+        init_mod_dttm = mailbox.modified
+
+        # True implies the mailbox was updated with the new password
+        self.assertTrue(reset_mailbox_password(email_address,
+                                               'password90125'))
+
+        # Refresh the mailbox
+        mailbox = get_mailbox(email_address)
+
+        # Now that the password was reset, the modified date should be updated
+        self.assertGreater(mailbox.modified, init_mod_dttm)
+
+        # The password changed field should be populated now
+        self.assertIsInstance(mailbox.passwordlastchanged, datetime)
+
+        # cleanup
+        self.assertTrue(delete_mailbox(email_address))
 
 
 class MailboxSearchTest(MailboxBaseCase):

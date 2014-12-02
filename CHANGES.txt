@@ -1,3 +1,9 @@
+# 0.1.6
+
+- bookkeeping fixes:
+    - populates created and modified date fields when adding a mailbox
+    - populates modified and lastpasswordchange fields when resetting password
+
 # 0.1.5
 
 - fixes issue where the all aliases were not deleted when deleting a mailbox

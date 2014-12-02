@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.orm.exc import NoResultFound
 
 from .domain import domain_exists
@@ -53,6 +55,8 @@ def create_mailbox(email_address,
     mailbox.local_part = local_part
     mailbox.active = 1
     mailbox.name = full_name
+    mailbox.created = datetime.now()
+    mailbox.modified = datetime.now()
 
     # Creates a self-referrential alias; Not exactly sure why, but iredadmin
     # does this
@@ -137,6 +141,8 @@ def reset_mailbox_password(email_address, plain_password):
 
     mailbox = get_mailbox(email_address)
     mailbox.password = generate_md5_password(plain_password)
+    mailbox.modified = datetime.now()
+    mailbox.passwordlastchanged = datetime.now()
 
     db_session = get_db_session()
     db_session.add(mailbox)
