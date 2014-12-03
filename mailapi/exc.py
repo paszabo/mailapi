@@ -39,7 +39,9 @@ class MailboxExists(Exception):
 class DbInitError(Exception):
     """ To be raised when the database connection hasn't been initialized
     """
-    pass
+    def __init__(self):
+        super(DbInitError, self).__init__('You must call init_db before '
+                                          'making any API calls.')
 
 
 class AliasExists(Exception):
