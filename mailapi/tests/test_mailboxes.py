@@ -13,6 +13,7 @@ from ..mailbox import (
 from ..alias import get_aliases
 from ..domain import create_domain, delete_domain
 from ..models import Mailbox
+from ..exc import NoSuchMailbox, MailboxExists, NoSuchDomain
 
 
 class MailboxBaseCase(TestCase):
@@ -51,8 +52,8 @@ class CreateMailboxTests(MailboxBaseCase):
         # creates the mailbox
         create_mailbox(email_address, 'Test User', 'password123')
 
-        # creating the same mailbox should raise a RuntimeError
-        self.assertRaises(RuntimeError,
+        # creating the same mailbox should raise a MailboxExists error
+        self.assertRaises(MailboxExists,
                           create_mailbox,
                           email_address,
                           'Test User',
@@ -62,7 +63,9 @@ class CreateMailboxTests(MailboxBaseCase):
         self.assertTrue(delete_mailbox(email_address))
 
     def test_create_mailbox_for_domain_that_doesnt_exist(self):
-        self.assertRaises(RuntimeError,
+        # Creating a mailbox for a non-existant domain should raise a
+        # NoSuchDomain error
+        self.assertRaises(NoSuchDomain,
                           create_mailbox,
                           'test@fakedomain.tld',
                           'Test User',
@@ -117,7 +120,10 @@ class DeleteMailboxTests(MailboxBaseCase):
 
     def test_delete_invalid_mailbox(self):
         email_address = ''.join(['asdfasdflksdf', '@', self.domain_name])
-        self.assertRaises(RuntimeError, delete_mailbox, email_address)
+
+        # Deleting a mailbox that hasn't been inserted should raise a
+        # NoSuchMailbox error
+        self.assertRaises(NoSuchMailbox, delete_mailbox, email_address)
 
     def test_alias_deleted(self):
         """ Makes sure that the self referrential alias gets deleted """
@@ -156,7 +162,7 @@ class GetMailboxTests(MailboxBaseCase):
         self.assertTrue(delete_mailbox(email_address))
 
     def test_get_nonexistant_mailbox(self):
-        self.assertFalse(get_mailbox('asjdhfakjsdhf'))
+        self.assertIsNone(get_mailbox('asjdhfakjsdhf'))
 
     def test_get_all_mailboxes(self):
         email_address = ''.join(['testusr', '@', self.domain_name])
@@ -192,9 +198,9 @@ class MailboxPasswordResetTests(MailboxBaseCase):
         self.assertTrue(delete_mailbox(email_address))
 
     def test_reset_password_for_nonexistant_mailbox(self):
-        # A RuntimeError should be raised when resetting the password for a
+        # A NoSuchMailbox should be raised when resetting the password for a
         # non existant mailbox
-        self.assertRaises(RuntimeError,
+        self.assertRaises(NoSuchMailbox,
                           reset_mailbox_password,
                           'adsfadsf',
                           'new password')

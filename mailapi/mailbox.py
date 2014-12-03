@@ -9,6 +9,7 @@ from .models import Mailbox
 from .helpers import parse_email_domain
 from .alias import add_alias, delete_aliases, delete_alias
 from .db import get_db_session
+from .exc import NoSuchDomain, MailboxExists, NoSuchMailbox
 
 
 def create_mailbox(email_address,
@@ -27,21 +28,20 @@ def create_mailbox(email_address,
     :param language: I guess for i18n
     :param storage_base_dir: Usually /var/vmail
     :param storage_node: /var/vmail/<storage_node>
-    :raises: ValueError if the given email address is invalid
-    :raises: RuntimeError if the domain does not exist
-    :raises: RuntimeError if the mailbox already exists
+    :raises ValueError: if the given email address is invalid
+    :raises NoSuchDomain: If the domain does not exist
+    :raises NoSuchMailbox: If the mailbox already exists
     :return: Mailbox object
     """
 
     # Get domain and user; Possible ValueError
-    local_part, domain = parse_email_domain(email_address)
+    local_part, domain_part = parse_email_domain(email_address)
 
-    if not domain_exists(domain):
-        raise RuntimeError('Domain does not exist.')
+    if not domain_exists(domain_part):
+        raise NoSuchDomain(domain_part)
 
     if mailbox_exists(email_address):
-        raise RuntimeError('A mailbox with the email address %s already '
-                           'exists.' % email_address)
+        raise MailboxExists(email_address)
 
     mailbox = Mailbox()
     mailbox.username = email_address
@@ -51,7 +51,7 @@ def create_mailbox(email_address,
     mailbox.storagenode = storage_node
     mailbox.maildir = generate_maildir_path(email_address)
     mailbox.quota = int(quota)
-    mailbox.domain = domain
+    mailbox.domain = domain_part
     mailbox.local_part = local_part
     mailbox.active = 1
     mailbox.name = full_name
@@ -92,8 +92,7 @@ def delete_mailbox(email_address):
     """
 
     if not mailbox_exists(email_address):
-        raise RuntimeError('The given email address does not exist: %s' %
-                           email_address)
+        raise NoSuchMailbox(email_address)
 
     delete_aliases(email_address)
     delete_alias(email_address, email_address)
@@ -132,12 +131,11 @@ def reset_mailbox_password(email_address, plain_password):
     :param email_address: Email address
     :param plain_password: The new desired password in plain text form
     :return: True if success
-    :raises RuntimeError: If the given email address does not exist
+    :raises NoSuchMailbox: If the given email address does not exist
     """
 
     if not mailbox_exists(email_address):
-        raise RuntimeError('The given email address does not exist: %s' %
-                           email_address)
+        raise NoSuchMailbox(email_address)
 
     mailbox = get_mailbox(email_address)
     mailbox.password = generate_md5_password(plain_password)

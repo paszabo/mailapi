@@ -7,11 +7,17 @@ def generate_maildir_path(mail,
                           hashed_maildir=True,
                           prepend_domain_name=True,
                           append_timestamp=True):
-    """ Generate path of mailbox."""
+    """ Generate path of mailbox.
+
+    Source: https://bitbucket.org/zhb/iredadmin-ose/src/fb7d39f487feb4b2eb2635990f1363ba73e404e6/libs/iredutils.py?at=default#cl-544
+
+    Modified to raise a ValueError instead of returning a tuple
+
+    :raises ValueError: If the email address is invalid.
+    """
 
     if not is_email(mail):
-        raise RuntimeError('Invalid email address.')
-        # return (False, 'INVALID_EMAIL_ADDRESS')
+        raise ValueError('Invalid email address.')
 
     # Get user/domain part from mail address.
     username, domain = mail.split('@', 1)

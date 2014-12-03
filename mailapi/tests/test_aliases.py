@@ -4,6 +4,7 @@ from ..models import Alias
 from ..alias import add_alias, delete_alias, delete_aliases, get_aliases
 from ..domain import create_domain, delete_domain
 from ..mailbox import create_mailbox
+from ..exc import AliasExists
 
 
 class AliasBaseCase(TestCase):
@@ -62,8 +63,8 @@ class AddAliasTests(AliasBaseCase):
         # Adds the alias to the DB
         add_alias(alias_source, alias_dest)
 
-        # Adding the same alias should raise a RuntimeError
-        self.assertRaises(RuntimeError, add_alias, alias_source, alias_dest)
+        # Adding the same alias should raise a AliasExists exception
+        self.assertRaises(AliasExists, add_alias, alias_source, alias_dest)
 
         # cleanup
         self.assertTrue(delete_alias(alias_source, alias_dest))

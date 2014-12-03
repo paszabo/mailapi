@@ -2,6 +2,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from .models import Domain, Mailbox, Alias
 from .db import get_db_session
 from .validators import is_domain
+from .exc import NoSuchDomain, DomainExists
 
 
 # Error messages can go here
@@ -14,7 +15,7 @@ def create_domain(domain_name, description=''):
     :param domain_name: A valid domain name
     :param description: A description of the domain
     :return: Domain model object
-    :raises RuntimeError: if the given domain already exists
+    :raises DomainExists: if the given domain already exists
     :raises ValueError: if the domain name is not a domain name
     """
 
@@ -22,8 +23,7 @@ def create_domain(domain_name, description=''):
         raise ValueError('Invalid domain name supplied: %s' % domain_name)
 
     if domain_exists(domain_name):
-        raise RuntimeError('A domain with the name supplied already exists: %s'
-                           % domain_name)
+        raise DomainExists(domain_name)
 
     db_session = get_db_session()
     d = Domain(domain=domain_name, description=description)
@@ -55,7 +55,7 @@ def get_all_mailboxes(domain_name):
     """
 
     if not domain_exists(domain_name):
-        raise RuntimeError(DOMAIN_DNE % domain_name)
+        raise NoSuchDomain(domain_name)
 
     return get_db_session().query(Mailbox).filter_by(domain=domain_name).all()
 
@@ -75,11 +75,11 @@ def delete_domain(domain_name):
 
     :param domain_name: String
     :return: True if success
-    :raises RuntimeError: if hte given domain name doesn't exist
+    :raises NoSuchDomain: If the given domain name doesn't exist
     """
 
     if not domain_exists(domain_name):
-        raise RuntimeError(DOMAIN_DNE % domain_name)
+        raise NoSuchDomain(domain_name)
 
     # Delete aliases and mailboxes
     delete_aliases(domain_name)
@@ -98,11 +98,11 @@ def delete_aliases(domain_name):
 
     :param domain_name: String
     :return: True if success else False
-    :raises RuntimeError: If the given domain does not exist
+    :raises NoSuchDomain: If the given domain does not exist
     """
 
     if not domain_exists(domain_name):
-        raise RuntimeError(DOMAIN_DNE % domain_name)
+        raise NoSuchDomain(domain_name)
 
     num_deleted = get_db_session().query(Alias).\
         filter_by(domain=domain_name).delete()
@@ -115,11 +115,11 @@ def delete_mailboxes(domain_name):
 
     :param domain_name: String
     :return: True if success else False
-    :raises RuntimeError: If the given domain does not exist
+    :raises NoSuchDomain: If the given domain does not exist
     """
 
     if not domain_exists(domain_name):
-        raise RuntimeError(DOMAIN_DNE % domain_name)
+        raise NoSuchDomain(domain_name)
 
     num_deleted = get_db_session().query(Mailbox).\
         filter_by(domain=domain_name).delete()

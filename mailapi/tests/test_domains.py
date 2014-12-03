@@ -12,6 +12,7 @@ from ..domain import (
     get_all_mailboxes,
 )
 from ..mailbox import create_mailbox
+from ..exc import DomainExists, NoSuchDomain
 
 
 class CreateDomainTests(TestCase):
@@ -39,8 +40,8 @@ class CreateDomainTests(TestCase):
         # Creates the domain
         create_domain(domain_name, domain_description)
 
-        # Creating the same domain again should raise a RuntimeError
-        self.assertRaises(RuntimeError,
+        # Creating the same domain again should raise a DomainExists exception
+        self.assertRaises(DomainExists,
                           create_domain,
                           domain_name,
                           domain_description)
@@ -94,8 +95,8 @@ class GetDomainTests(TestCase):
 
 class DeleteDomainTests(TestCase):
     def test_delete_nonexistant_domain(self):
-        # Deleting a non-existant domain should raise a RuntimeError
-        self.assertRaises(RuntimeError, delete_domain, 'aslkdjhfaksjdhfakj')
+        # Deleting a non-existant domain should raise a NoSuchDomain error
+        self.assertRaises(NoSuchDomain, delete_domain, 'aslkdjhfaksjdhfakj')
 
 
 class DeleteDomainAliasesTests(TestCase):
@@ -118,7 +119,7 @@ class DeleteDomainAliasesTests(TestCase):
         self.assertTrue(delete_domain(domain_name))
 
     def test_delete_aliases_for_nonexistant_domain(self):
-        self.assertRaises(RuntimeError, delete_aliases, 'asdfasdfasdf')
+        self.assertRaises(NoSuchDomain, delete_aliases, 'asdfasdfasdf')
 
     def test_delete_aliases_for_zeroalias_domain(self):
         domain_name = 'testdomain.lan'
@@ -153,7 +154,7 @@ class DeleteDomainMailboxesTests(TestCase):
         self.assertTrue(delete_domain(domain_name))
 
     def test_delete_mailboxes_for_nonexistant_domain(self):
-        self.assertRaises(RuntimeError, delete_mailboxes, 'asdfasdf')
+        self.assertRaises(NoSuchDomain, delete_mailboxes, 'asdfasdf')
 
     def test_delete_mailboxes_for_zeromailbox_domain(self):
         domain_name = 'testdomain.lan'
@@ -213,5 +214,5 @@ class GetAllMailboxesTests(TestCase):
         self.assertTrue(delete_domain(domain_name))
 
     def test_get_all_mailboxes_for_nonexistant_domain(self):
-        # Should raise a runtime error
-        self.assertRaises(RuntimeError, get_all_mailboxes, 'asdfkljahsdfkja')
+        # Should raise a NoSuchDomain error
+        self.assertRaises(NoSuchDomain, get_all_mailboxes, 'asdfkljahsdfkja')

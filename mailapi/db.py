@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import DeferredReflection
 
 from .models import Base
+from .exc import DbInitError
 
 
 # Don't use the DBSession directly since it may not be initialized, use the
@@ -41,10 +42,10 @@ def get_db_session():
     """ Get the database session object as long as it's bound to an engine
 
     :return: SQLAlchemy ORM Session object
-    :raises: RuntimeError if the session is not bound to an engine
+    :raises DbInitError: If the session is not bound to an engine
     """
     if not _DBSession.bind:
-        raise RuntimeError('You must initialize the database connection before'
-                           ' attempting to use it.')
+        raise DbInitError('You must initialize the database connection before'
+                          ' attempting to use it.')
     else:
         return _DBSession

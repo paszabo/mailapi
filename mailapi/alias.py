@@ -4,6 +4,7 @@ from .models import Alias
 from .helpers import parse_email_domain
 from .db import get_db_session
 from .validators import is_email
+from .exc import AliasExists
 
 
 def add_alias(source, dest):
@@ -13,7 +14,7 @@ def add_alias(source, dest):
     :param dest: Redirect to this mailbox
     :return: Alias
     :raises ValueError: if an invalid source or dest email address is provided
-    :raises RuntimeError: if the given alias already exists
+    :raises AliasExists: If the given alias already exists
     """
 
     if not is_email(source):
@@ -37,8 +38,7 @@ def add_alias(source, dest):
         return alias
     except IntegrityError:
         db_session.rollback()
-        raise RuntimeError('The given alias (%s --> %s) already exists.' %
-                           (source, dest))
+        raise AliasExists(source, dest)
 
 
 def get_aliases(dest):
