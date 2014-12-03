@@ -25,7 +25,7 @@ setup(
     ],
     author='Paul Szabo',
     author_email='paul@cupromotions.ca',
-    url='',
+    url='https://github.com/paszabo/mailapi',
     keywords='iredadmin iredmail email api',
     packages=find_packages(),
     include_package_data=True,
