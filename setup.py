@@ -16,7 +16,7 @@ requires = [
 
 setup(
     name='MailApi',
-    version='0.1.6',
+    version='0.1.7',
     description='An interface to iredadmin',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[

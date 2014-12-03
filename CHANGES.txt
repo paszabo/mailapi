@@ -1,3 +1,14 @@
+# 0.1.7
+
+- Custom exception class definitions
+    - They are mostly self-explanatory, but here is the break down:
+        - AliasExists: raised when trying to create an alias that already exists in the database
+        - DbInitError: raised when init_db has not been called
+        - MailboxExists: raised when adding a mailbox that already exists in the database
+        - NoSuchMailbox: raised when trying to access a mailbox that does not exist in the database
+        - DomainExists: raised when trying to create a domain that already exists
+        - NoSuchDomain: raised when trying to access a domain that does not exist in the database
+
 # 0.1.6
 
 - bookkeeping fixes:
