@@ -1,3 +1,7 @@
+# 0.1.8
+
+- sorts mailboxes by username
+
 # 0.1.7
 
 - Custom exception class definitions
