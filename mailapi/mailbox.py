@@ -108,7 +108,7 @@ def get_all_mailboxes():
     :return: List of Mailbox objects
     """
 
-    return get_db_session().query(Mailbox).all()
+    return get_db_session().query(Mailbox).order_by(Mailbox.username).all()
 
 
 def get_mailbox(email_address):

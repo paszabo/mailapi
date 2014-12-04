@@ -22,7 +22,7 @@ To do so simply call the `init_db` method with a SQLAlchemy database URL.  If yo
 
 Example:
 
-            import mailapi, mailapi.domain
+            import mailapi
 
             mailapi.domain.get_all_domains() # throws a RuntimeError
 
