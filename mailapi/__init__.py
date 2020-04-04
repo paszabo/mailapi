@@ -1,5 +1,5 @@
-import domain
-import mailbox
-import alias
-import exc
+from . import domain
+from . import mailbox
+from . import alias
+from . import exc
 from .db import init_db

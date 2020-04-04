@@ -32,7 +32,7 @@ def create_domain(domain_name, description=''):
     return d
 
 
-def get_domain(domain_name):
+def get_domain(domain_name: str):
     """ Gets a domain with the given name from the db
 
     :param domain_name: String
