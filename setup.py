@@ -10,18 +10,17 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'SQLAlchemy',
-    'mysql-python',
+    'pymysql',
     'pep8',
 ]
 
 setup(
     name='MailApi',
-    version='0.1.8',
+    version='0.2.0',
     description='An interface to iredadmin',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
     ],
     author='Paul Szabo',
     author_email='paszabo@gmail.com',

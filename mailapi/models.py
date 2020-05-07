@@ -23,3 +23,7 @@ class Domain(Base):
 
 class Alias(Base):
     __tablename__ = 'alias'
+
+
+class UsedQuota(Base):
+    __tablename__ = 'used_quota'

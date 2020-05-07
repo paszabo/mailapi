@@ -1,4 +1,4 @@
-import md5crypt
+from . import md5crypt
 
 from .helpers import generate_random_strings
 
